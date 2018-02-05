@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Sunshine</string>
+    <string name="message">Watch face tapped</string>
+    <string name="my_analog_name">My Analog</string>
+    <string name="title_activity_sunshine_watch_face_config">SunshineWatchFaceConfig</string>
 </resources>
