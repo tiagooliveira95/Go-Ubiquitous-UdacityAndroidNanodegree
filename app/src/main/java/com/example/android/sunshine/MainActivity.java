@@ -34,7 +34,15 @@ import android.widget.ProgressBar;
 
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
+import com.example.android.sunshine.models.WeatherResult;
+import com.example.android.sunshine.sync.RestApiWeather;
 import com.example.android.sunshine.sync.SunshineSyncUtils;
+import com.example.android.sunshine.sync.WeatherRequest;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor>,
@@ -86,11 +94,26 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_forecast);
         getSupportActionBar().setElevation(0f);
 
+        final WeatherRequest weatherRequest = new WeatherRequest(this);
+        weatherRequest.setCityName("Aveiro");
+        RestApiWeather.getInstance().getWeather(weatherRequest).enqueue(new Callback<WeatherResult>() {
+            @Override
+            public void onResponse(Call<WeatherResult> call, Response<WeatherResult> response) {
+                WeatherResult weatherResult = response.body();
+                Log.d("WATHER",String.valueOf(weatherResult.getWind().getSpeed()));
+            }
+
+            @Override
+            public void onFailure(Call<WeatherResult> call, Throwable t) {
+                Log.d("WATHER","Fail " + t.getMessage());
+            }
+        });
+
         /*
          * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
          * do things like set the adapter of the RecyclerView and toggle the visibility.
          */
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_forecast);
+        mRecyclerView =  findViewById(R.id.recyclerview_forecast);
 
         /*
          * The ProgressBar that will indicate to the user that we are loading data. It will be
@@ -99,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements
          * Please note: This so called "ProgressBar" isn't a bar by default. It is more of a
          * circle. We didn't make the rules (or the names of Views), we just follow them.
          */
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        mLoadingIndicator =  findViewById(R.id.pb_loading_indicator);
 
         /*
          * A LinearLayoutManager is responsible for measuring and positioning item views within a
