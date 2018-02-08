@@ -28,6 +28,9 @@ import android.widget.TextView;
 import com.example.android.sunshine.utilities.SunshineDateUtils;
 import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
  * from a {@link android.database.Cursor} to a {@link android.support.v7.widget.RecyclerView}.
@@ -265,22 +268,21 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
      * OnClickListener, since it has access to the adapter and the views.
      */
     class ForecastAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        final ImageView iconView;
+        @BindView(R.id.weather_icon)
+        ImageView iconView;
 
-        final TextView dateView;
-        final TextView descriptionView;
-        final TextView highTempView;
-        final TextView lowTempView;
+        @BindView(R.id.date)
+        TextView dateView;
+        @BindView(R.id.weather_description)
+        TextView descriptionView;
+        @BindView(R.id.high_temperature)
+        TextView highTempView;
+        @BindView(R.id.low_temperature)
+        TextView lowTempView;
 
         ForecastAdapterViewHolder(View view) {
             super(view);
-
-            iconView = (ImageView) view.findViewById(R.id.weather_icon);
-            dateView = (TextView) view.findViewById(R.id.date);
-            descriptionView = (TextView) view.findViewById(R.id.weather_description);
-            highTempView = (TextView) view.findViewById(R.id.high_temperature);
-            lowTempView = (TextView) view.findViewById(R.id.low_temperature);
-
+            ButterKnife.bind(this,view);
             view.setOnClickListener(this);
         }
 

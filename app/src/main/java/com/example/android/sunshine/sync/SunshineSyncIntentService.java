@@ -23,6 +23,7 @@ import android.content.Intent;
  * a service on a separate handler thread.
  */
 public class SunshineSyncIntentService extends IntentService {
+    public static final String ARG_FORECAST = "forecast";
 
     public SunshineSyncIntentService() {
         super("SunshineSyncIntentService");
@@ -30,6 +31,6 @@ public class SunshineSyncIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        SunshineSyncTask.syncWeather(this);
+        SunshineSyncTask.syncWeather(this,intent.getParcelableExtra(ARG_FORECAST));
     }
 }

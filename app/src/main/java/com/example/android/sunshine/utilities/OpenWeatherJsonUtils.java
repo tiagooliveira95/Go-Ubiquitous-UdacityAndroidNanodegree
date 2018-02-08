@@ -30,6 +30,7 @@ import java.net.HttpURLConnection;
 /**
  * Utility functions to handle OpenWeatherMap JSON data.
  */
+@Deprecated
 public final class OpenWeatherJsonUtils {
 
     /* Location information */

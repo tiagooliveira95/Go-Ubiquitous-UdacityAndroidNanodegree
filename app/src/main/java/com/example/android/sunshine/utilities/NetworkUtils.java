@@ -31,6 +31,7 @@ import java.util.Scanner;
 /**
  * These utilities will be used to communicate with the weather servers.
  */
+@Deprecated
 public final class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();

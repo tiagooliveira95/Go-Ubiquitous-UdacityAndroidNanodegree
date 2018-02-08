@@ -22,11 +22,8 @@ import android.text.format.DateUtils;
 
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
-import com.example.android.sunshine.utilities.NetworkUtils;
+import com.example.android.sunshine.models.ForecastResult;
 import com.example.android.sunshine.utilities.NotificationUtils;
-import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
-
-import java.net.URL;
 
 public class SunshineSyncTask {
 
@@ -38,22 +35,10 @@ public class SunshineSyncTask {
      *
      * @param context Used to access utility methods and the ContentResolver
      */
-    synchronized public static void syncWeather(Context context) {
+    synchronized public static void syncWeather(Context context, ForecastResult forecastResult) {
 
         try {
-            /*
-             * The getUrl method will return the URL that we need to get the forecast JSON for the
-             * weather. It will decide whether to create a URL based off of the latitude and
-             * longitude or off of a simple location as a String.
-             */
-            URL weatherRequestUrl = NetworkUtils.getUrl(context);
-
-            /* Use the URL to retrieve the JSON */
-            String jsonWeatherResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
-
-            /* Parse the JSON into a list of weather values */
-            ContentValues[] weatherValues = OpenWeatherJsonUtils
-                    .getWeatherContentValuesFromJson(context, jsonWeatherResponse);
+            ContentValues[] weatherValues = forecastResult.getContentValues();
 
             /*
              * In cases where our JSON contained an error code, getWeatherContentValuesFromJson

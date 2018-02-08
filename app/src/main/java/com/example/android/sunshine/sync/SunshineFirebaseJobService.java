@@ -16,12 +16,20 @@
 package com.example.android.sunshine.sync;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.example.android.sunshine.models.ForecastResult;
+import com.example.android.sunshine.models.ForecastRequest;
 import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.firebase.jobdispatcher.RetryStrategy;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class SunshineFirebaseJobService extends JobService {
@@ -40,21 +48,36 @@ public class SunshineFirebaseJobService extends JobService {
      */
     @Override
     public boolean onStartJob(final JobParameters jobParameters) {
-
-        mFetchWeatherTask = new AsyncTask<Void, Void, Void>(){
+        Log.d("Service", "StartFromService");
+        Context context = getApplicationContext();
+        RestApiWeather.getInstance().getForecast(new ForecastRequest(context)).enqueue(new Callback<ForecastResult>() {
             @Override
-            protected Void doInBackground(Void... voids) {
-                Context context = getApplicationContext();
-                SunshineSyncTask.syncWeather(context);
-                jobFinished(jobParameters, false);
-                return null;
+            public void onResponse(Call<ForecastResult> call, Response<ForecastResult> response) {
+                mFetchWeatherTask = new AsyncTask<Void, Void, Void>(){
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        Log.d("SUC", "SUC: " + response.body().getCurrently().getSummary());
+                        SunshineSyncTask.syncWeather(context,response.body());
+                        jobFinished(jobParameters, false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        jobFinished(jobParameters, false);
+                    }
+                };
+
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
+            public void onFailure(Call<ForecastResult> call, Throwable t) {
                 jobFinished(jobParameters, false);
+                Log.d("FAIL", "Failure: " + t.getMessage());
             }
-        };
+        });
+
+
 
         mFetchWeatherTask.execute();
         return true;
@@ -75,4 +98,6 @@ public class SunshineFirebaseJobService extends JobService {
         }
         return true;
     }
+
+
 }

@@ -34,12 +34,14 @@ import android.widget.ProgressBar;
 
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
+import com.example.android.sunshine.models.ForecastResult;
 import com.example.android.sunshine.models.WeatherResult;
 import com.example.android.sunshine.sync.RestApiWeather;
 import com.example.android.sunshine.sync.SunshineSyncUtils;
-import com.example.android.sunshine.sync.WeatherRequest;
+import com.example.android.sunshine.models.ForecastRequest;
 
-import okhttp3.OkHttpClient;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -82,10 +84,15 @@ public class MainActivity extends AppCompatActivity implements
     private static final int ID_FORECAST_LOADER = 44;
 
     private ForecastAdapter mForecastAdapter;
-    private RecyclerView mRecyclerView;
+
+    @BindView(R.id.recyclerview_forecast)
+    RecyclerView mRecyclerView;
+
+    @BindView(R.id.pb_loading_indicator)
+    ProgressBar mLoadingIndicator;
+
     private int mPosition = RecyclerView.NO_POSITION;
 
-    private ProgressBar mLoadingIndicator;
 
 
     @Override
@@ -93,36 +100,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forecast);
         getSupportActionBar().setElevation(0f);
-
-        final WeatherRequest weatherRequest = new WeatherRequest(this);
-        weatherRequest.setCityName("Aveiro");
-        RestApiWeather.getInstance().getWeather(weatherRequest).enqueue(new Callback<WeatherResult>() {
-            @Override
-            public void onResponse(Call<WeatherResult> call, Response<WeatherResult> response) {
-                WeatherResult weatherResult = response.body();
-                Log.d("WATHER",String.valueOf(weatherResult.getWind().getSpeed()));
-            }
-
-            @Override
-            public void onFailure(Call<WeatherResult> call, Throwable t) {
-                Log.d("WATHER","Fail " + t.getMessage());
-            }
-        });
-
-        /*
-         * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
-         * do things like set the adapter of the RecyclerView and toggle the visibility.
-         */
-        mRecyclerView =  findViewById(R.id.recyclerview_forecast);
-
-        /*
-         * The ProgressBar that will indicate to the user that we are loading data. It will be
-         * hidden when no data is loading.
-         *
-         * Please note: This so called "ProgressBar" isn't a bar by default. It is more of a
-         * circle. We didn't make the rules (or the names of Views), we just follow them.
-         */
-        mLoadingIndicator =  findViewById(R.id.pb_loading_indicator);
+        ButterKnife.bind(this);
 
         /*
          * A LinearLayoutManager is responsible for measuring and positioning item views within a
@@ -257,7 +235,6 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
 
         mForecastAdapter.swapCursor(data);
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
