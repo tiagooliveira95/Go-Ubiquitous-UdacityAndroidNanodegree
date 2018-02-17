@@ -25,7 +25,7 @@ public class NotificationUtils {
      * the user know there is new weather data available.
      */
     public static final String[] WEATHER_NOTIFICATION_PROJECTION = {
-            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON,
             WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
             WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
     };
@@ -75,13 +75,14 @@ public class NotificationUtils {
         if (todayWeatherCursor.moveToFirst()) {
 
             /* Weather ID as returned by API, used to identify the icon to be used */
-            int weatherId = todayWeatherCursor.getInt(INDEX_WEATHER_ID);
+            String shortDescription = todayWeatherCursor.getString(todayWeatherCursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY));
+            String weather = todayWeatherCursor.getString(todayWeatherCursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON));
             double high = todayWeatherCursor.getDouble(INDEX_MAX_TEMP);
             double low = todayWeatherCursor.getDouble(INDEX_MIN_TEMP);
 
             Resources resources = context.getResources();
             int largeArtResourceId = SunshineWeatherUtils
-                    .getLargeArtResourceIdForWeatherCondition(weatherId);
+                    .getLargeArtResourceIdForWeatherCondition(weather);
 
             Bitmap largeIcon = BitmapFactory.decodeResource(
                     resources,
@@ -89,11 +90,11 @@ public class NotificationUtils {
 
             String notificationTitle = context.getString(R.string.app_name);
 
-            String notificationText = getNotificationText(context, weatherId, high, low);
+            String notificationText = getNotificationText(context, shortDescription, high, low);
 
             /* getSmallArtResourceIdForWeatherCondition returns the proper art to show given an ID */
             int smallArtResourceId = SunshineWeatherUtils
-                    .getSmallArtResourceIdForWeatherCondition(weatherId);
+                    .getSmallArtResourceIdForWeatherCondition(weather);
 
             /*
              * NotificationCompat Builder is a very convenient way to build backward-compatible
@@ -151,28 +152,26 @@ public class NotificationUtils {
      * Forecast: Sunny - High: 14°C Low 7°C
      *
      * @param context   Used to access utility methods and resources
-     * @param weatherId ID as determined by Open Weather Map
+     * @param shortDescription description is determined by Darksky
      * @param high      High temperature (either celsius or fahrenheit depending on preferences)
      * @param low       Low temperature (either celsius or fahrenheit depending on preferences)
      * @return Summary of a particular day's forecast
      */
-    private static String getNotificationText(Context context, int weatherId, double high, double low) {
+    private static String getNotificationText(Context context, String shortDescription, double high, double low) {
 
         /*
          * Short description of the weather, as provided by the API.
          * e.g "clear" vs "sky is clear".
          */
-        String shortDescription = SunshineWeatherUtils
-                .getStringForWeatherCondition(context, weatherId);
+
 
         String notificationFormat = context.getString(R.string.format_notification);
 
         /* Using String's format method, we create the forecast summary */
-        String notificationText = String.format(notificationFormat,
+
+        return String.format(notificationFormat,
                 shortDescription,
                 SunshineWeatherUtils.formatTemperature(context, high),
                 SunshineWeatherUtils.formatTemperature(context, low));
-
-        return notificationText;
     }
 }

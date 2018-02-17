@@ -25,6 +25,7 @@ import android.support.v4.app.ShareCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,6 +34,22 @@ import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.databinding.ActivityDetailBinding;
 import com.example.android.sunshine.utilities.SunshineDateUtils;
 import com.example.android.sunshine.utilities.SunshineWeatherUtils;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.android.gms.wearable.CapabilityClient;
+import com.google.android.gms.wearable.DataClient;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+
+import java.util.Date;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class DetailActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -55,7 +72,7 @@ public class DetailActivity extends AppCompatActivity implements
             WeatherContract.WeatherEntry.COLUMN_PRESSURE,
             WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
             WeatherContract.WeatherEntry.COLUMN_DEGREES,
-            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON
     };
 
     /*
@@ -97,6 +114,17 @@ public class DetailActivity extends AppCompatActivity implements
      */
     private ActivityDetailBinding mDetailBinding;
 
+    private static final String COUNT_KEY = "com.example.key.count";
+    private DataClient mDataClient;
+    private int count = 0;
+
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,19 +137,14 @@ public class DetailActivity extends AppCompatActivity implements
 
         /* This connects our Activity into the loader lifecycle. */
         getSupportLoaderManager().initLoader(ID_DETAIL_LOADER, null, this);
+
+
+
+
     }
 
-    /**
-     * This is where we inflate and set up the menu for this Activity.
-     *
-     * @param menu The options menu in which you place your items.
-     *
-     * @return You must return true for the menu to be displayed;
-     *         if you return false it will not be shown.
-     *
-     * @see android.app.Activity#onPrepareOptionsMenu(Menu)
-     * @see #onOptionsItemSelected
-     */
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         /* Use AppCompatActivity's method getMenuInflater to get a handle on the menu inflater */
@@ -243,7 +266,7 @@ public class DetailActivity extends AppCompatActivity implements
          * Weather Icon *
          ****************/
         /* Read weather condition ID from the cursor (ID provided by Open Weather Map) */
-        int weatherId = data.getInt(INDEX_WEATHER_CONDITION_ID);
+        String weatherId = data.getString(INDEX_WEATHER_CONDITION_ID);
         /* Use our utility method to determine the resource ID for the proper art */
         int weatherImageId = SunshineWeatherUtils.getLargeArtResourceIdForWeatherCondition(weatherId);
 
@@ -271,7 +294,7 @@ public class DetailActivity extends AppCompatActivity implements
          * Weather Description *
          ***********************/
         /* Use the weatherId to obtain the proper description */
-        String description = SunshineWeatherUtils.getStringForWeatherCondition(this, weatherId);
+        String description = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY));
 
         /* Create the accessibility (a11y) String from the weather description */
         String descriptionA11y = getString(R.string.a11y_forecast, description);

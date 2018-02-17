@@ -144,20 +144,19 @@ public class ForecastResult implements Parcelable {
             double high;
             double low;
 
-            int weatherId = 1;
-
+            String weatherIcon;
 
             dateTimeMillis = normalizedUtcStartDay + SunshineDateUtils.DAY_IN_MILLIS * i;
-
 
             pressure = data.getPressure();
             humidity = (int) data.getHumidity();
             windSpeed = data.getWindSpeed();
             windDirection = data.getWindBearing();
 
-
             high = data.getTemperatureHigh();
             low = data.getTemperatureLow();
+
+            weatherIcon = data.getIcon();
 
             ContentValues weatherValues = new ContentValues();
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATE, dateTimeMillis);
@@ -167,7 +166,8 @@ public class ForecastResult implements Parcelable {
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, windDirection);
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, high);
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, low);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherId);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON, weatherIcon);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY, weatherIcon.replace("-"," ").substring(0, 1).toUpperCase() + weatherIcon.substring(1));
 
             weatherContentValues[i] = weatherValues;
         }

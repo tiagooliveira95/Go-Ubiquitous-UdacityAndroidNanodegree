@@ -86,7 +86,11 @@ public class WeatherContract {
         public static final String COLUMN_DATE = "date";
 
         /* Weather ID as returned by API, used to identify the icon to be used */
-        public static final String COLUMN_WEATHER_ID = "weather_id";
+        public static final String COLUMN_WEATHER_ICON = "weather_icon";
+
+        /*Used to store weather summary */
+        public static final String COLUMN_WEATHER_SUMMARY = "weather_summary";
+
 
         /* Min and max temperatures in °C for the day (stored as floats in the database) */
         public static final String COLUMN_MIN_TEMP = "min";
@@ -100,6 +104,8 @@ public class WeatherContract {
 
         /* Wind speed is stored as a float representing wind speed in mph */
         public static final String COLUMN_WIND_SPEED = "wind";
+
+
 
         /*
          * Degrees are meteorological degrees (e.g, 0 is north, 180 is south).

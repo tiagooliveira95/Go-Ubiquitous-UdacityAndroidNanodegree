@@ -175,7 +175,7 @@ public final class OpenWeatherJsonUtils {
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, windDirection);
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, high);
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, low);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherId);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON, weatherId);
 
             weatherContentValues[i] = weatherValues;
         }

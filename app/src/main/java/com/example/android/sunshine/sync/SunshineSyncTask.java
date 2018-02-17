@@ -19,6 +19,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
@@ -39,6 +40,7 @@ public class SunshineSyncTask {
 
         try {
             ContentValues[] weatherValues = forecastResult.getContentValues();
+
 
             /*
              * In cases where our JSON contained an error code, getWeatherContentValuesFromJson

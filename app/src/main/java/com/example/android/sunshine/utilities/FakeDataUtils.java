@@ -30,7 +30,7 @@ public class FakeDataUtils {
         testWeatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, maxTemp);
         testWeatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, maxTemp - (int) (Math.random()*10));
         testWeatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, Math.random()*10);
-        testWeatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherIDs[(int)(Math.random()*10)%5]);
+        testWeatherValues.put(WeatherEntry.COLUMN_WEATHER_ICON, weatherIDs[(int)(Math.random()*10)%5]);
         return testWeatherValues;
     }
 

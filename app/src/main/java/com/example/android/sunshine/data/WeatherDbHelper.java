@@ -75,7 +75,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
 
                 WeatherEntry.COLUMN_DATE       + " INTEGER NOT NULL, "                 +
 
-                WeatherEntry.COLUMN_WEATHER_ID + " INTEGER NOT NULL,"                  +
+                WeatherEntry.COLUMN_WEATHER_ICON + " TEXT NOT NULL,"                  +
 
                 WeatherEntry.COLUMN_MIN_TEMP   + " REAL NOT NULL, "                    +
                 WeatherEntry.COLUMN_MAX_TEMP   + " REAL NOT NULL, "                    +
@@ -85,6 +85,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
 
                 WeatherEntry.COLUMN_WIND_SPEED + " REAL NOT NULL, "                    +
                 WeatherEntry.COLUMN_DEGREES    + " REAL NOT NULL, "                    +
+                WeatherEntry.COLUMN_WEATHER_SUMMARY + " TEXT NOT NULL, " +
 
                 /*
                  * To ensure this table can only contain one weather entry per date, we declare

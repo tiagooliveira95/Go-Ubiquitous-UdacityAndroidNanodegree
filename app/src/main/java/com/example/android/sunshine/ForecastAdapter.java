@@ -25,6 +25,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.sunshine.data.WeatherContract;
+import com.example.android.sunshine.models.ForecastResult;
 import com.example.android.sunshine.utilities.SunshineDateUtils;
 import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 
@@ -134,10 +136,12 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
     public void onBindViewHolder(ForecastAdapterViewHolder forecastAdapterViewHolder, int position) {
         mCursor.moveToPosition(position);
 
+        ForecastResult forecastResult;
+
         /****************
          * Weather Icon *
          ****************/
-        int weatherId = mCursor.getInt(MainActivity.INDEX_WEATHER_CONDITION_ID);
+        String weatherIcon = mCursor.getString(MainActivity.INDEX_WEATHER_CONDITION_ID);
         int weatherImageId;
 
         int viewType = getItemViewType(position);
@@ -146,12 +150,12 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
 
             case VIEW_TYPE_TODAY:
                 weatherImageId = SunshineWeatherUtils
-                        .getLargeArtResourceIdForWeatherCondition(weatherId);
+                        .getLargeArtResourceIdForWeatherCondition(weatherIcon);
                 break;
 
             case VIEW_TYPE_FUTURE_DAY:
                 weatherImageId = SunshineWeatherUtils
-                        .getSmallArtResourceIdForWeatherCondition(weatherId);
+                        .getSmallArtResourceIdForWeatherCondition(weatherIcon);
                 break;
 
             default:
@@ -174,7 +178,7 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
         /***********************
          * Weather Description *
          ***********************/
-        String description = SunshineWeatherUtils.getStringForWeatherCondition(mContext, weatherId);
+        String description = mCursor.getString(mCursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY));
          /* Create the accessibility (a11y) String from the weather description */
         String descriptionA11y = mContext.getString(R.string.a11y_forecast, description);
 

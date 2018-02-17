@@ -38,7 +38,7 @@ import static com.example.android.sunshine.data.WeatherContract.WeatherEntry.COL
 import static com.example.android.sunshine.data.WeatherContract.WeatherEntry.COLUMN_MAX_TEMP;
 import static com.example.android.sunshine.data.WeatherContract.WeatherEntry.COLUMN_MIN_TEMP;
 import static com.example.android.sunshine.data.WeatherContract.WeatherEntry.COLUMN_PRESSURE;
-import static com.example.android.sunshine.data.WeatherContract.WeatherEntry.COLUMN_WEATHER_ID;
+import static com.example.android.sunshine.data.WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON;
 import static com.example.android.sunshine.data.WeatherContract.WeatherEntry.COLUMN_WIND_SPEED;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -127,7 +127,7 @@ class TestUtilities {
         testWeatherValues.put(COLUMN_MAX_TEMP, 75);
         testWeatherValues.put(COLUMN_MIN_TEMP, 65);
         testWeatherValues.put(COLUMN_WIND_SPEED, 5.5);
-        testWeatherValues.put(COLUMN_WEATHER_ID, 321);
+        testWeatherValues.put(COLUMN_WEATHER_ICON, 321);
 
         return testWeatherValues;
     }
@@ -164,7 +164,7 @@ class TestUtilities {
             weatherValues.put(COLUMN_MAX_TEMP, 75 + i);
             weatherValues.put(COLUMN_MIN_TEMP, 65 - i);
             weatherValues.put(COLUMN_WIND_SPEED, 5.5 + 0.2 * (float) i);
-            weatherValues.put(COLUMN_WEATHER_ID, 321);
+            weatherValues.put(COLUMN_WEATHER_ICON, 321);
 
             bulkTestWeatherValues[i] = weatherValues;
         }

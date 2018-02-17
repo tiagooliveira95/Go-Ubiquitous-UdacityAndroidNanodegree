@@ -98,7 +98,7 @@ public class TestSunshineDatabase {
     private static final String columnDateVariableName = "COLUMN_DATE";
     static String REFLECTED_COLUMN_DATE;
 
-    private static final String columnWeatherIdVariableName = "COLUMN_WEATHER_ID";
+    private static final String columnWeatherIdVariableName = "COLUMN_WEATHER_ICON";
     static String REFLECTED_COLUMN_WEATHER_ID;
 
     private static final String columnMinVariableName = "COLUMN_MIN_TEMP";

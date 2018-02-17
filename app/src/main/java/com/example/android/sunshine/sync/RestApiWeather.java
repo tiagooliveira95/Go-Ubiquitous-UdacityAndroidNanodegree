@@ -57,26 +57,12 @@ public class RestApiWeather {
         return INSTANCE;
     }
 
-    public Call<WeatherResult> getWeather(ForecastRequest weatherRequest) {
-        HashMap<String, String> map = new HashMap<>();
-        map.put("q", weatherRequest.getCityName());
-        map.put("APPID", weatherRequest.getAPPID());
-        map.put(DAYS_PARAM, weatherRequest.getNumDays());
-        map.put(FORMAT_PARAM, weatherRequest.getFormat());
-        map.put(UNITS_PARAM,weatherRequest.getUnits());
-
-
-        return weatherService.weather(map);
-    }
 
     public Call<ForecastResult> getForecast(ForecastRequest weatherRequest) {
         return weatherService.forecast(weatherRequest.getAPPID(),"40.6837,-8.5975","auto");
     }
 
     interface WeatherService {
-        @GET("weather")
-        Call<WeatherResult> weather(@QueryMap Map<String, String> options);
-
         @GET("forecast/{key}/{latlong}")
         Call<ForecastResult> forecast(@Path("key") String APIKEY, @Path("latlong") String latLong, @Query("units") String units);
 
