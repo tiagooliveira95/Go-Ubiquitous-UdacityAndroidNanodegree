@@ -67,7 +67,7 @@ public class SunshineFirebaseJobService extends JobService {
                         jobFinished(jobParameters, false);
                     }
                 };
-
+                mFetchWeatherTask.execute();
             }
 
             @Override
@@ -77,9 +77,6 @@ public class SunshineFirebaseJobService extends JobService {
             }
         });
 
-
-
-        mFetchWeatherTask.execute();
         return true;
     }
 

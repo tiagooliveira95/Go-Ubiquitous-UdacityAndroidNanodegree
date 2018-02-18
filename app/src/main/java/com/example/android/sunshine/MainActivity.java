@@ -110,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements
         getSupportActionBar().setElevation(0f);
         ButterKnife.bind(this);
 
+
+        SunshineSyncUtils.startImmediateSync(this);
         /*
          * A LinearLayoutManager is responsible for measuring and positioning item views within a
          * RecyclerView into a linear list. This means that it can produce either a horizontal or

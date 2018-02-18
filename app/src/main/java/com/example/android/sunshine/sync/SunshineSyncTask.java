@@ -25,6 +25,11 @@ import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.models.ForecastResult;
 import com.example.android.sunshine.utilities.NotificationUtils;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
 public class SunshineSyncTask {
 
@@ -36,7 +41,8 @@ public class SunshineSyncTask {
      *
      * @param context Used to access utility methods and the ContentResolver
      */
-    synchronized public static void syncWeather(Context context, ForecastResult forecastResult) {
+    synchronized static void syncWeather(Context context, ForecastResult forecastResult) {
+        syncWear(context,forecastResult);
 
         try {
             ContentValues[] weatherValues = forecastResult.getContentValues();
@@ -99,5 +105,23 @@ public class SunshineSyncTask {
             /* Server probably invalid */
             e.printStackTrace();
         }
+    }
+
+    private static void syncWear(Context context, ForecastResult forecastResult){
+        PutDataMapRequest dataMap = PutDataMapRequest.create("/weather");
+        dataMap.setUrgent();
+
+        ForecastResult.Daily daily = forecastResult.getDaily();
+        ForecastResult.Datum_ datum = daily.getData().get(0);
+
+
+        dataMap.getDataMap().putDouble("high", datum.getTemperatureHigh());
+        dataMap.getDataMap().putDouble("low", datum.getTemperatureLow());
+        dataMap.getDataMap().putString("icon", datum.getIcon());
+
+
+        PutDataRequest request = dataMap.asPutDataRequest();
+        Wearable.getDataClient(context).putDataItem(request).isSuccessful();
+
     }
 }
