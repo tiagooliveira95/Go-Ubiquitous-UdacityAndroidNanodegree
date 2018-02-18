@@ -14,8 +14,10 @@ public class ForecastRequest {
     private String APPID;
     private String cityName;
     private String countryCode;
-    private String lat;
-    private String lon;
+    //Default location
+    private String lat = "40.6837";
+    private String lon = "-8.5975";
+
     private int numDays = 14;
     private String units = "metric";
     private String format = "json";

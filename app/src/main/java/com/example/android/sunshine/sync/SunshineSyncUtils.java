@@ -22,9 +22,12 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.models.ForecastRequest;
 import com.example.android.sunshine.models.ForecastResult;
+import com.example.android.sunshine.models.GeoRequest;
+import com.example.android.sunshine.models.GeoResult;
 import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.Driver;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
@@ -190,6 +193,26 @@ public class SunshineSyncUtils {
      * @param context The Context used to start the IntentService for the sync.
      */
     public static void startImmediateSync(@NonNull final Context context) {
+        GeoRequest geoRequest = new GeoRequest(context, SunshinePreferences.getPreferredWeatherLocation(context));
+        RestApiWeather.getInstance().getGeoData(geoRequest)
+                .enqueue(new Callback<GeoResult>() {
+            @Override
+            public void onResponse(Call<GeoResult> call, Response<GeoResult> response) {
+                GeoResult geoResult = response.body();
+                assert geoResult != null;
+                SunshinePreferences.setLocationDetails(context,
+                        geoResult.getResults().get(0).getGeometry().getLocation().getLat(),
+                        geoResult.getResults().get(0).getGeometry().getLocation().getLng()
+                );
+            }
+
+            @Override
+            public void onFailure(Call<GeoResult> call, Throwable t) {
+
+            }
+        });
+
+
         RestApiWeather.getInstance().getForecast(new ForecastRequest(context))
                 .enqueue(new Callback<ForecastResult>() {
                     @Override

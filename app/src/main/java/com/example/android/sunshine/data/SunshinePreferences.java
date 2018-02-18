@@ -20,6 +20,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.example.android.sunshine.R;
+import com.example.android.sunshine.sync.RestApiWeather;
 
 public final class SunshinePreferences {
 

@@ -6,6 +6,8 @@ import com.example.android.sunshine.models.ForecastRequest;
 import com.example.android.sunshine.models.GeoRequest;
 import com.example.android.sunshine.models.GeoResult;
 
+import java.util.Locale;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -73,7 +75,12 @@ public class RestApiWeather {
 
 
     Call<ForecastResult> getForecast(ForecastRequest weatherRequest) {
-        return weatherService.forecast(weatherRequest.getAPPID(),"40.6837,-8.5975","auto");
+        return weatherService.forecast(
+                weatherRequest.getAPPID(),
+                String.format(Locale.getDefault(),
+                        "%s,%s",weatherRequest.getLat(),weatherRequest.getLon()),
+                "auto"
+        );
     }
 
     public Call<GeoResult> getGeoData(GeoRequest geoRequest){
