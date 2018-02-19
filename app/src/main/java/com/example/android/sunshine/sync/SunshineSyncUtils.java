@@ -205,11 +205,8 @@ public class SunshineSyncUtils {
                         geoResult.getResults().get(0).getGeometry().getLocation().getLng()
                 );
             }
-
             @Override
-            public void onFailure(Call<GeoResult> call, Throwable t) {
-
-            }
+            public void onFailure(Call<GeoResult> call, Throwable t) {}
         });
 
 
@@ -217,7 +214,6 @@ public class SunshineSyncUtils {
                 .enqueue(new Callback<ForecastResult>() {
                     @Override
                     public void onResponse(Call<ForecastResult> call, Response<ForecastResult> response) {
-                        Log.d("SUC", "SUC: " + response.body().getCurrently().getSummary());
                         Intent intentToSyncImmediately = new Intent(context, SunshineSyncIntentService.class);
                         intentToSyncImmediately.putExtra(SunshineSyncIntentService.ARG_FORECAST, response.body());
                         context.startService(intentToSyncImmediately);
