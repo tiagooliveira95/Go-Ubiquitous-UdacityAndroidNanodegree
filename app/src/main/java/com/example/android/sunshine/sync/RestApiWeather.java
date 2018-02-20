@@ -65,7 +65,7 @@ public class RestApiWeather {
         weatherService = retrofitBuilder.build().create(WeatherService.class);
     }
 
-    public static RestApiWeather getInstance() {
+    static RestApiWeather getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new RestApiWeather();
         }
@@ -83,7 +83,7 @@ public class RestApiWeather {
         );
     }
 
-    public Call<GeoResult> getGeoData(GeoRequest geoRequest){
+    Call<GeoResult> getGeoData(GeoRequest geoRequest){
         return geoService.geoData(geoRequest.getFormat(),geoRequest.getAddress(),geoRequest.getKEY());
     }
 
