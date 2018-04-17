@@ -573,37 +573,19 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                         mCenterY - mSecondHandLength,
                         mSecondAndHighlightPaint);
             }
-            canvas.drawCircle(
-                    mCenterX, mCenterY, CENTER_GAP_AND_CIRCLE_RADIUS, mTickAndCirclePaint);
+
+
+            if(mAmbient && (mLowBitAmbient || mBurnInProtection)) {
+                canvas.drawCircle(
+                        mCenterX, mCenterY, CENTER_GAP_AND_CIRCLE_RADIUS, mTickAndCirclePaint);
+            }
 
             /* Restore the canvas' original orientation. */
             canvas.restore();
 
- /*
-            float x = mCenterX- mClockPaint.measureText("00:00")/2 ;
-
-            String hourString;
-            hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
-
-            canvas.drawText(hourString, x, mCenterY, mClockPaint);
-            x += mClockPaint.measureText(hourString);
-
-            canvas.drawText(":", x, mCenterY, mClockPaint);
-            x += mColonPaint.measureText(":");
-
-            // Draw the minutes.
-            String minuteString = formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
-
-            canvas.drawText(minuteString, x, mCenterY, mClockPaint);
-
-*/
-
-
-
 
             String high = String.valueOf(tempHigh) + "ºC";
             String low = String.valueOf(tempLow) + "ºC";
-
 
 
             Paint p = mAmbient ? mTemperatureHighAmbientPaint : mTemperatureHighPaint;

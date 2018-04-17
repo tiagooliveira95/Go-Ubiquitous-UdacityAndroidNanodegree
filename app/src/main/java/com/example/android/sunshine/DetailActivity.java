@@ -20,6 +20,7 @@ import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.CursorLoader;
@@ -72,7 +73,8 @@ public class DetailActivity extends AppCompatActivity implements
             WeatherContract.WeatherEntry.COLUMN_PRESSURE,
             WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
             WeatherContract.WeatherEntry.COLUMN_DEGREES,
-            WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY
     };
 
     /*
@@ -137,9 +139,6 @@ public class DetailActivity extends AppCompatActivity implements
 
         /* This connects our Activity into the loader lifecycle. */
         getSupportLoaderManager().initLoader(ID_DETAIL_LOADER, null, this);
-
-
-
 
     }
 
@@ -209,6 +208,7 @@ public class DetailActivity extends AppCompatActivity implements
      *
      * @return A new Loader instance that is ready to start loading.
      */
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle loaderArgs) {
 
@@ -239,7 +239,7 @@ public class DetailActivity extends AppCompatActivity implements
      * @param data   The cursor that is being returned.
      */
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
 
         /*
          * Before we bind the data to the UI that will display that data, we need to check the
@@ -347,7 +347,7 @@ public class DetailActivity extends AppCompatActivity implements
          * Humidity *
          ************/
         /* Read humidity from the cursor */
-        float humidity = data.getFloat(INDEX_WEATHER_HUMIDITY);
+        float humidity = data.getFloat(INDEX_WEATHER_HUMIDITY) * 100;
         String humidityString = getString(R.string.format_humidity, humidity);
 
         String humidityA11y = getString(R.string.a11y_humidity, humidityString);

@@ -49,6 +49,8 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -202,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements
      * @param bundle   Any arguments supplied by the caller
      * @return A new Loader instance that is ready to start loading.
      */
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle bundle) {
 

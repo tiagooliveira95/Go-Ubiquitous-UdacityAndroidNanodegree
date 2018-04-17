@@ -73,7 +73,6 @@ public class RestApiWeather {
         return INSTANCE;
     }
 
-
     Call<ForecastResult> getForecast(ForecastRequest weatherRequest) {
         return weatherService.forecast(
                 weatherRequest.getAPPID(),

@@ -28,6 +28,7 @@ public class NotificationUtils {
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON,
             WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
             WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY
     };
 
     /*
@@ -72,6 +73,7 @@ public class NotificationUtils {
          * If todayWeatherCursor is empty, moveToFirst will return false. If our cursor is not
          * empty, we want to show the notification.
          */
+        assert todayWeatherCursor != null;
         if (todayWeatherCursor.moveToFirst()) {
 
             /* Weather ID as returned by API, used to identify the icon to be used */

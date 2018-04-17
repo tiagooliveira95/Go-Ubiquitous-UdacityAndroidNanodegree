@@ -1,6 +1,7 @@
 package com.example.android.sunshine.models;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -59,6 +60,10 @@ public class ForecastResult implements Parcelable {
 
     };
 
+    public ForecastResult(Cursor cursor){
+
+    }
+
     protected ForecastResult(Parcel in) {
         this.latitude = ((double) in.readValue((double.class.getClassLoader())));
         this.longitude = ((double) in.readValue((double.class.getClassLoader())));
@@ -107,7 +112,6 @@ public class ForecastResult implements Parcelable {
         return offset;
     }
 
-
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(latitude);
         dest.writeValue(longitude);
@@ -137,7 +141,7 @@ public class ForecastResult implements Parcelable {
 
             long dateTimeMillis;
             double pressure;
-            int humidity;
+            double humidity;
             double windSpeed;
             double windDirection;
 
@@ -149,7 +153,7 @@ public class ForecastResult implements Parcelable {
             dateTimeMillis = normalizedUtcStartDay + SunshineDateUtils.DAY_IN_MILLIS * i;
 
             pressure = data.getPressure();
-            humidity = (int) data.getHumidity();
+            humidity = data.getHumidity();
             windSpeed = data.getWindSpeed();
             windDirection = data.getWindBearing();
 
@@ -167,7 +171,7 @@ public class ForecastResult implements Parcelable {
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, high);
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, low);
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON, weatherIcon);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY, weatherIcon.replace("-"," ").substring(0, 1).toUpperCase() + weatherIcon.substring(1));
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY, weatherIcon.replace("-"," "));
 
             weatherContentValues[i] = weatherValues;
         }
