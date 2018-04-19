@@ -16,35 +16,21 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.wearable.complications.ComplicationData;
-import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
 
 import com.example.wear.R;
-import com.google.android.gms.wearable.DataClient;
-import com.google.android.gms.wearable.DataEvent;
-import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItem;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.MessageClient;
-import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.Wearable;
 
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-import java.util.prefs.Preferences;
 
 /**
  * Analog watch face with a ticking second hand. In ambient mode, the second hand isn't
@@ -155,6 +141,9 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
         int tempHigh;
         int tempLow;
+
+        String sHighFormatted;
+        String sLowFormatted;
 
         String icon;
 
@@ -560,6 +549,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                     mCenterY - mMinuteHandLength,
                     mMinutePaint);
 
+
             /*
              * Ensure the "seconds" hand is drawn only when we are in interactive mode.
              * Otherwise, we only update the watch face once a minute.
@@ -583,28 +573,24 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             /* Restore the canvas' original orientation. */
             canvas.restore();
 
-
-            String high = String.valueOf(tempHigh) + "ºC";
-            String low = String.valueOf(tempLow) + "ºC";
-
-
             Paint p = mAmbient ? mTemperatureHighAmbientPaint : mTemperatureHighPaint;
             Paint pLow = mAmbient ? mTemperatureLowAmbientPaint : mTemperatureLowPaint;
 
             float tempY = bounds.height()/1.3f;
 
             canvas.drawText(
-                    high,
-                    mCenterX - p.measureText(high)/2,
+                    sHighFormatted,
+                    mCenterX - p.measureText(sHighFormatted)/2,
                     tempY,
                     p
             );
 
-            canvas.drawText(low,
-                    mCenterX - pLow.measureText(low)/2,
+            canvas.drawText(sLowFormatted,
+                    mCenterX - pLow.measureText(sLowFormatted)/2,
                     tempY + mTemperatureHighHeight,
                     pLow
             );
+
 
 
 
@@ -689,6 +675,8 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             tempLow = preferences.getInt("low",-0);
             icon = preferences.getString("icon","storm");
             mRainBitmap = BitmapFactory.decodeResource(getResources(),getSmallArtResourceIdForWeatherCondition(icon));
+            sHighFormatted = SunshineWearUtils.formatTemperature(getBaseContext(),tempHigh);
+            sLowFormatted = SunshineWearUtils.formatTemperature(getBaseContext(),tempLow);
         }
 
 

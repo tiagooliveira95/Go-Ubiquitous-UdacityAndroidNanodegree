@@ -14,8 +14,8 @@ public class ForecastRequest {
     private String APPID;
 
     private int numDays = 14;
-    private final String UNITS_SI = "si";
-    private final String UNITS_US = "us";
+    public static final String UNITS_SI = "si";
+    public static final String UNITS_US = "us";
     private String lat,lon;
     private String units;
 
@@ -27,7 +27,7 @@ public class ForecastRequest {
         double[] preferredCoordinates = SunshinePreferences.getLocationCoordinates(context);
         lat = String.valueOf(preferredCoordinates[0]);
         lon = String.valueOf(preferredCoordinates[1]);
-        units = SunshinePreferences.isMetric(context) ? UNITS_SI : UNITS_US;
+        units = SunshinePreferences.getUnits(context);
     }
 
 

@@ -16,11 +16,16 @@
 package com.example.android.sunshine.utilities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.util.Log;
 
 import com.example.android.sunshine.R;
 import com.example.android.sunshine.data.SunshinePreferences;
+import com.example.android.sunshine.models.ForecastResult;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
 /**
  * Contains useful utilities for a weather app, such as conversion between Celsius and Fahrenheit,
@@ -205,5 +210,15 @@ public final class SunshineWeatherUtils {
 
         Log.e(LOG_TAG, "Unknown Weather: " + weatherIcon);
         return R.drawable.art_storm;
+    }
+
+    public static void notifyWearUnitsChanged(Context context) {
+            PutDataMapRequest dataMap = PutDataMapRequest.create("/weather");
+            dataMap.setUrgent();
+
+            dataMap.getDataMap().putBoolean("units", SunshinePreferences.isMetric(context));
+
+            PutDataRequest request = dataMap.asPutDataRequest();
+            Wearable.getDataClient(context).putDataItem(request).isSuccessful();
     }
 }

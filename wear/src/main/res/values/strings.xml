@@ -1,6 +1,8 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Sunshine</string>
     <string name="message">Watch face tapped</string>
     <string name="my_analog_name">My Analog</string>
     <string name="title_activity_sunshine_watch_face_config">SunshineWatchFaceConfig</string>
-</resources>
+    <string name="format_temperature">
+        <xliff:g id="temp">%1.0f</xliff:g>\u00B0
+    </string></resources>

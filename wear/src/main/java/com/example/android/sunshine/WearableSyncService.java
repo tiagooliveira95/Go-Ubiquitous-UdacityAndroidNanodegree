@@ -56,6 +56,11 @@ public class WearableSyncService extends WearableListenerService {
                     PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().putString("icon", dataMap.getString("icon")).apply();
                     Log.d(TAG, "DATA: " + dataMap.getString("icon"));
                 }
+
+                if(dataMap.containsKey("units")){
+                    PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().putBoolean("units", dataMap.getBoolean("units")).apply();
+                    Log.d(TAG, "DATA: " + dataMap.getString("units"));
+                }
             }
 
             Intent intent = new Intent("weather_changed");

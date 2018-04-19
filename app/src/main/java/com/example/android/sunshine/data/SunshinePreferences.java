@@ -20,6 +20,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.example.android.sunshine.R;
+import com.example.android.sunshine.models.ForecastRequest;
+import com.example.android.sunshine.models.ForecastResult;
 import com.example.android.sunshine.sync.RestApiWeather;
 
 public final class SunshinePreferences {
@@ -242,5 +244,9 @@ public final class SunshinePreferences {
         String lastNotificationKey = context.getString(R.string.pref_last_notification);
         editor.putLong(lastNotificationKey, timeOfNotification);
         editor.apply();
+    }
+
+    public static String getUnits(Context context) {
+        return isMetric(context) ? ForecastRequest.UNITS_SI : ForecastRequest.UNITS_US;
     }
 }
