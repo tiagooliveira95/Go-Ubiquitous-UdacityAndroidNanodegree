@@ -243,5 +243,12 @@
         High:<xliff:g id="high">%2$s</xliff:g>
         Low:<xliff:g id="low">%3$s</xliff:g>
     </string>
+    <string name="weather_condition_thunderstorm">Thunderstorm</string>
+    <string name="weather_condition_rain">Rain</string>
+    <string name="weather_condition_snow">Snow</string>
+    <string name="weather_condition_fog">Fog</string>
+    <string name="weather_condition_clear">Clear Day</string>
+    <string name="weather_condition_partly_cloudy">Partly Cloudy</string>
+    <string name="weather_condition_cloudy">Cloudy</string>
 
 </resources>

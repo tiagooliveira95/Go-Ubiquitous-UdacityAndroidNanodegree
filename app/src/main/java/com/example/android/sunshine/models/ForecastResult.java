@@ -60,10 +60,6 @@ public class ForecastResult implements Parcelable {
 
     };
 
-    public ForecastResult(Cursor cursor){
-
-    }
-
     protected ForecastResult(Parcel in) {
         this.latitude = ((double) in.readValue((double.class.getClassLoader())));
         this.longitude = ((double) in.readValue((double.class.getClassLoader())));
@@ -148,6 +144,8 @@ public class ForecastResult implements Parcelable {
             double high;
             double low;
 
+            String summary;
+
             String weatherIcon;
 
             dateTimeMillis = normalizedUtcStartDay + SunshineDateUtils.DAY_IN_MILLIS * i;
@@ -160,6 +158,8 @@ public class ForecastResult implements Parcelable {
             high = data.getTemperatureHigh();
             low = data.getTemperatureLow();
 
+            summary = data.getSummary();
+
             weatherIcon = data.getIcon();
 
             ContentValues weatherValues = new ContentValues();
@@ -171,7 +171,7 @@ public class ForecastResult implements Parcelable {
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, high);
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, low);
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON, weatherIcon);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY, weatherIcon.replace("-"," "));
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY, summary);
 
             weatherContentValues[i] = weatherValues;
         }

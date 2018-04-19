@@ -16,6 +16,7 @@
 package com.example.android.sunshine.utilities;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.Log;
 
 import com.example.android.sunshine.R;
@@ -132,20 +133,7 @@ public final class SunshineWeatherUtils {
     }
 
 
-    /**
-     * Helper method to provide the icon resource id according to the weather condition id returned
-     * by the OpenWeatherMap call. This method is very similar to
-     *
-     *   {@link #getLargeArtResourceIdForWeatherCondition(int)}.
-     *
-     * The difference between these two methods is that this method provides smaller assets, used
-     * in the list item layout for a "future day", as well as
-     *
-     * @param weatherIcon from OpenWeatherMap API response
-     *                  See http://openweathermap.org/weather-conditions for a list of all IDs
-     *
-     * @return resource id for the corresponding icon. -1 if no relation is found.
-     */
+
     public static int getSmallArtResourceIdForWeatherCondition(String weatherIcon) {
 
         /*
@@ -173,55 +161,30 @@ public final class SunshineWeatherUtils {
         return R.drawable.ic_storm;
     }
 
-    /**
-     * Helper method to provide the art resource ID according to the weather condition ID returned
-     * by the OpenWeatherMap call. This method is very similar to
-     *
-     *   {@link #getSmallArtResourceIdForWeatherCondition(int)}.
-     *
-     * The difference between these two methods is that this method provides larger assets, used
-     * in the "today view" of the list, as well as in the DetailActivity.
-     *
-     * @param weatherIcon from OpenWeatherMap API response
-     *                  See http://openweathermap.org/weather-conditions for a list of all IDs
-     *
-     * @return resource ID for the corresponding icon. -1 if no relation is found.
-     */
+    public static String getWeatherDescription(Resources res, String weatherIcon) {
+        if (weatherIcon.equals("thunderstorm")) {
+            return res.getString(R.string.weather_condition_thunderstorm);
+            //} else if (weatherIcon >= 300 && weatherIcon <= 321) {
+            //    return R.drawable.ic_light_rain;
+        } else if (weatherIcon.equals("rain")) {
+            return res.getString(R.string.weather_condition_rain);
+        } else if (weatherIcon.equals("snow")) {
+            return res.getString(R.string.weather_condition_snow);
+        } else if (weatherIcon.equals("fog")) {
+            return res.getString(R.string.weather_condition_fog);
+        } else if (weatherIcon.equals("clear-day")) {
+            return res.getString(R.string.weather_condition_clear);
+        } else if (weatherIcon.equals("partly-cloudy-day") || weatherIcon.equals("partly-cloudy-night")) {
+            return res.getString(R.string.weather_condition_partly_cloudy);
+        } else if (weatherIcon.equals("cloudy")) {
+            return res.getString(R.string.weather_condition_cloudy);
+        }
+
+        Log.e(LOG_TAG, "Unknown Weather: " + weatherIcon);
+        return res.getString(R.string.weather_condition_fog);
+    }
+
     public static int getLargeArtResourceIdForWeatherCondition(String weatherIcon) {
-
-        /*
-         * Based on weather code data for Open Weather Map.
-         */
-      /*  if (weatherIcon >= 200 && weatherIcon <= 232) {
-            return R.drawable.art_storm;
-        } else if (weatherIcon >= 300 && weatherIcon <= 321) {
-            return R.drawable.art_light_rain;
-        } else if (weatherIcon >= 500 && weatherIcon <= 504) {
-            return R.drawable.art_rain;
-        } else if (weatherIcon == 511) {
-            return R.drawable.art_snow;
-        } else if (weatherIcon >= 520 && weatherIcon <= 531) {
-            return R.drawable.art_rain;
-        } else if (weatherIcon >= 600 && weatherIcon <= 622) {
-            return R.drawable.art_snow;
-        } else if (weatherIcon >= 701 && weatherIcon <= 761) {
-            return R.drawable.art_fog;
-        } else if (weatherIcon == 761 || weatherIcon == 771 || weatherIcon == 781) {
-            return R.drawable.art_storm;
-        } else if (weatherIcon == 800) {
-            return R.drawable.art_clear;
-        } else if (weatherIcon == 801) {
-            return R.drawable.art_light_clouds;
-        } else if (weatherIcon >= 802 && weatherIcon <= 804) {
-            return R.drawable.art_clouds;
-        } else if (weatherIcon >= 900 && weatherIcon <= 906) {
-            return R.drawable.art_storm;
-        } else if (weatherIcon >= 958 && weatherIcon <= 962) {
-            return R.drawable.art_storm;
-        } else if (weatherIcon >= 951 && weatherIcon <= 957) {
-            return R.drawable.art_clear;
-        }*/
-
         if (weatherIcon.equals("thunderstorm")) {
             return R.drawable.art_storm;
             //} else if (weatherIcon >= 300 && weatherIcon <= 321) {

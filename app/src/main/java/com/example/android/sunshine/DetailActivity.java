@@ -73,8 +73,7 @@ public class DetailActivity extends AppCompatActivity implements
             WeatherContract.WeatherEntry.COLUMN_PRESSURE,
             WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
             WeatherContract.WeatherEntry.COLUMN_DEGREES,
-            WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON,
-            WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ICON
     };
 
     /*
@@ -294,7 +293,7 @@ public class DetailActivity extends AppCompatActivity implements
          * Weather Description *
          ***********************/
         /* Use the weatherId to obtain the proper description */
-        String description = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY));
+        String description = SunshineWeatherUtils.getWeatherDescription(getResources(),weatherId);
 
         /* Create the accessibility (a11y) String from the weather description */
         String descriptionA11y = getString(R.string.a11y_forecast, description);

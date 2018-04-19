@@ -12,15 +12,12 @@ import com.example.android.sunshine.data.SunshinePreferences;
 public class ForecastRequest {
 
     private String APPID;
-    private String cityName;
-    private String countryCode;
-    //Default location
-    private String lat = "40.6837";
-    private String lon = "-8.5975";
 
     private int numDays = 14;
-    private String units = "metric";
-    private String format = "json";
+    private final String UNITS_SI = "si";
+    private final String UNITS_US = "us";
+    private String lat,lon;
+    private String units;
 
     /**
      * Load Defaults
@@ -30,52 +27,17 @@ public class ForecastRequest {
         double[] preferredCoordinates = SunshinePreferences.getLocationCoordinates(context);
         lat = String.valueOf(preferredCoordinates[0]);
         lon = String.valueOf(preferredCoordinates[1]);
-        cityName = SunshinePreferences.getPreferredWeatherLocation(context);
+        units = SunshinePreferences.isMetric(context) ? UNITS_SI : UNITS_US;
     }
 
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-    }
 
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
-    }
-
-    public void setLatLong(String lat, String lon) {
-        this.lat = lat;
-        this.lon = lon;
-    }
-
-    public String getCityName() {
-        return cityName;
-    }
 
     public String getAPPID() {
         return APPID;
     }
 
-    public void setNumDays(int numDays) {
-        this.numDays = numDays;
-    }
-
-    public void setUnits(String units) {
-        this.units = units;
-    }
-
     public String getUnits(){
         return units;
-    }
-
-    public String getNumDays() {
-        return String.valueOf(numDays);
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    public String getFormat() {
-        return format;
     }
 
     public String getLat() {

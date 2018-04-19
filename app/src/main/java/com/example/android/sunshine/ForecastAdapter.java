@@ -177,7 +177,7 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
         /***********************
          * Weather Description *
          ***********************/
-        String description = mCursor.getString(mCursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_SUMMARY));
+        String description = SunshineWeatherUtils.getWeatherDescription(mContext.getResources(),weatherIcon);
          /* Create the accessibility (a11y) String from the weather description */
         String descriptionA11y = mContext.getString(R.string.a11y_forecast, description);
 

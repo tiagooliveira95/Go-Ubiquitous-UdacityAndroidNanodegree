@@ -61,7 +61,7 @@ public class SunshineSyncUtils {
      * @param context Context used to create the GooglePlayDriver that powers the
      *                FirebaseJobDispatcher
      */
-    static void scheduleFirebaseJobDispatcherSync(@NonNull final Context context) {
+    private static void scheduleFirebaseJobDispatcherSync(@NonNull final Context context) {
 
         Driver driver = new GooglePlayDriver(context);
         FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(driver);
@@ -204,26 +204,27 @@ public class SunshineSyncUtils {
                         geoResult.getResults().get(0).getGeometry().getLocation().getLat(),
                         geoResult.getResults().get(0).getGeometry().getLocation().getLng()
                 );
+
+                RestApiWeather.getInstance().getForecast(new ForecastRequest(context))
+                        .enqueue(new Callback<ForecastResult>() {
+                            @Override
+                            public void onResponse(Call<ForecastResult> call, Response<ForecastResult> response) {
+                                Intent intentToSyncImmediately = new Intent(context, SunshineSyncIntentService.class);
+                                intentToSyncImmediately.putExtra(SunshineSyncIntentService.ARG_FORECAST, response.body());
+                                context.startService(intentToSyncImmediately);
+                            }
+
+                            @Override
+                            public void onFailure(Call<ForecastResult> call, Throwable t) {
+                                Log.d("FAIL", "Failure: " + t.getMessage());
+                            }
+                        });
             }
             @Override
             public void onFailure(Call<GeoResult> call, Throwable t) {}
         });
 
 
-        RestApiWeather.getInstance().getForecast(new ForecastRequest(context))
-                .enqueue(new Callback<ForecastResult>() {
-                    @Override
-                    public void onResponse(Call<ForecastResult> call, Response<ForecastResult> response) {
-                        Intent intentToSyncImmediately = new Intent(context, SunshineSyncIntentService.class);
-                        intentToSyncImmediately.putExtra(SunshineSyncIntentService.ARG_FORECAST, response.body());
-                        context.startService(intentToSyncImmediately);
-                    }
-
-                    @Override
-                    public void onFailure(Call<ForecastResult> call, Throwable t) {
-                        Log.d("FAIL", "Failure: " + t.getMessage());
-                    }
-                });
 
     }
 }

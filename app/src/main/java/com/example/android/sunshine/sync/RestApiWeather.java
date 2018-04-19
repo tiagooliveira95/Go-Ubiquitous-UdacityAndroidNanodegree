@@ -1,5 +1,7 @@
 package com.example.android.sunshine.sync;
 
+import android.content.Context;
+
 import com.example.android.sunshine.BuildConfig;
 import com.example.android.sunshine.models.ForecastResult;
 import com.example.android.sunshine.models.ForecastRequest;
@@ -29,10 +31,6 @@ public class RestApiWeather {
 
     private WeatherService weatherService;
     private GeoService geoService;
-
-    private static final String UNITS_PARAM = "units";
-    private static final String FORMAT_PARAM = "mode";
-    private static final String DAYS_PARAM = "cnt";
 
 
     private RestApiWeather() {
@@ -78,7 +76,7 @@ public class RestApiWeather {
                 weatherRequest.getAPPID(),
                 String.format(Locale.getDefault(),
                         "%s,%s",weatherRequest.getLat(),weatherRequest.getLon()),
-                "auto"
+                weatherRequest.getUnits()
         );
     }
 
