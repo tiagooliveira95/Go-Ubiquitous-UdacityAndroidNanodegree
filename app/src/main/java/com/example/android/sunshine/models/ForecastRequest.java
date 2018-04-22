@@ -23,7 +23,7 @@ public class ForecastRequest {
      * Load Defaults
      */
     public ForecastRequest(Context context){
-        APPID = context.getString(R.string.APPID);
+        APPID = context.getString(R.string.SKYKEY);
         double[] preferredCoordinates = SunshinePreferences.getLocationCoordinates(context);
         lat = String.valueOf(preferredCoordinates[0]);
         lon = String.valueOf(preferredCoordinates[1]);

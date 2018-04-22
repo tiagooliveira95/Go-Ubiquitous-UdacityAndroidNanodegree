@@ -162,8 +162,8 @@ public final class SunshineWeatherUtils {
             return R.drawable.ic_cloudy;
         }
 
-        Log.e(LOG_TAG, "Unknown Weather: " + weatherIcon);
-        return R.drawable.ic_storm;
+        Log.e(LOG_TAG, "1 Unknown Weather: " + weatherIcon);
+        return R.drawable.ic_fog;
     }
 
     public static String getWeatherDescription(Resources res, String weatherIcon) {
@@ -185,8 +185,8 @@ public final class SunshineWeatherUtils {
             return res.getString(R.string.weather_condition_cloudy);
         }
 
-        Log.e(LOG_TAG, "Unknown Weather: " + weatherIcon);
-        return res.getString(R.string.weather_condition_fog);
+        Log.e(LOG_TAG, "2 Unknown Weather: " + weatherIcon);
+        return weatherIcon;
     }
 
     public static int getLargeArtResourceIdForWeatherCondition(String weatherIcon) {
@@ -208,8 +208,8 @@ public final class SunshineWeatherUtils {
             return R.drawable.art_clouds;
         }
 
-        Log.e(LOG_TAG, "Unknown Weather: " + weatherIcon);
-        return R.drawable.art_storm;
+        Log.e(LOG_TAG, "3 Unknown Weather: " + weatherIcon);
+        return R.drawable.ic_fog;
     }
 
     public static void notifyWearUnitsChanged(Context context) {
@@ -221,4 +221,5 @@ public final class SunshineWeatherUtils {
             PutDataRequest request = dataMap.asPutDataRequest();
             Wearable.getDataClient(context).putDataItem(request).isSuccessful();
     }
+
 }

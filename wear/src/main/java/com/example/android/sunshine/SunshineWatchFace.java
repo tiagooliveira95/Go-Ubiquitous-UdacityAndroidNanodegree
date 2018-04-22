@@ -10,6 +10,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -30,6 +32,7 @@ import com.example.wear.R;
 
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -83,11 +86,11 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         }
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine{
+    private class Engine extends CanvasWatchFaceService.Engine {
         private static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";
-        
+
         private static final float SECOND_TICK_STROKE_WIDTH = 2f;
-        
+
         private static final int SHADOW_RADIUS = 6;
         /* Handler to update the time once a second in interactive mode. */
         private final Handler mUpdateTimeHandler = new EngineHandler(this);
@@ -104,16 +107,19 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         private float mCenterX;
         private float mCenterY;
 
-        private float sWidth,sHeight;
+        private float sWidth, sHeight;
 
         private float highTemperatureLabelHeight;
         private float lowTemperatureLableHeight;
-        private float hourLabelHeight;
+        private float hourLabelHeight, minLabelHeight;
+        private int hour,min;
 
         private float cityLabelHeight;
 
         private float verticalRightGuideLine;
         private float verticalLeftGuideLine;
+
+        private float horizontalCardGuideline1, horizontalCardGuideline2, horizontalCardGuideline3;
 
         private float cardY;
         private float cardY2;
@@ -123,7 +129,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         private float rightIndicatorCX;
         private float rightIndicatorCY;
 
-        private float rightIndicatorRadius ;
+        private float rightIndicatorRadius;
         private float rightIndicatorInnerShadowRadius;
 
         private float mWeatherIconX;
@@ -142,8 +148,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         private float hourLabelY;
         private float minLabelY;
 
-        private float mWeatherBitmapWidth,mWeatherBitmapHeight;
-
+        private float mWeatherBitmapWidth, mWeatherBitmapHeight;
 
 
         /* Colors for all hands (hour, minute, seconds, ticks) based on photo loaded. */
@@ -161,7 +166,8 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
         private Paint mCityLabelPaint;
 
-        private Paint mBackgroundPaint, mBackgroundPaintStroke;
+        private Paint cardPaint, cardStrokePaint;
+        private Paint lowBitCardPaint;
 
         private Paint mRightIndicatorStroke;
         private Paint mRightIndicator;
@@ -184,10 +190,12 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         private String sHighFormatted;
         private String sLowFormatted;
 
+        private String sCityName;
+
         private String icon;
 
         private float dp28;
-        private float sp12,sp18, sp32;
+        private float sp12, sp18, sp32;
 
         //private Bitmap mBackgroundBitmap;
         private Bitmap mWeatherBitmap;
@@ -196,20 +204,29 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         private boolean mLowBitAmbient;
         private boolean mBurnInProtection;
 
+        private boolean isRound;
+
         @SuppressWarnings("SuspiciousNameCombination")
-        private void setValues(float mCenterX, float mCenterY){
-            verticalRightGuideLine =  mCenterX  *  1.5f;
-            verticalLeftGuideLine  =  mCenterX  *  0.5f;
+        private void setValues(float mCenterX, float mCenterY) {
+            verticalRightGuideLine = mCenterX * 1.5f;
+            verticalLeftGuideLine = mCenterX * 0.5f;
 
-            float sHighFormattedWidth = highTemperatureLabelPaint.measureText(sHighFormatted);
-            float sLowFormattedWidth  = lowTemperatureLabelPaint.measureText(sLowFormatted);
+            Rect bound = new Rect();
+            mHourLabelPaint.getTextBounds(String.valueOf(hour),0,1,bound);
+            hourLabelHeight = bound.height();
 
-            float k = highTemperatureLabelPaint.measureText("°");
+            mMinutePaint.getTextBounds(String.valueOf(min),0,1,bound);
+            minLabelHeight = bound.height();
 
-            cardY =  mCenterY  *  0.9f;
-            cardY2 =  mCenterY  *  1.7f;
+            cardY = mCenterY * 0.9f;
+            cardY2 = mCenterY * 1.7f;
 
             cardCenterRelativeY = (cardY + cardY2) / 2f;
+
+            horizontalCardGuideline1 = (cardY + cardCenterRelativeY) / 2f;
+            horizontalCardGuideline2 = cardCenterRelativeY;
+            horizontalCardGuideline3 = (cardY2 + cardCenterRelativeY) / 2f;
+
 
             rightIndicatorCX = verticalRightGuideLine;
             rightIndicatorCY = cardCenterRelativeY;
@@ -217,21 +234,33 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             rightIndicatorRadius = dp28;
             rightIndicatorInnerShadowRadius = rightIndicatorRadius - 2f;
 
-            mWeatherIconX =  mWeatherBitmapWidth  /  2f;
-            mWeatherIconY =  mWeatherBitmapHeight /  2f;
+            mWeatherIconX = mWeatherBitmapWidth / 2f;
+            mWeatherIconY = mWeatherBitmapHeight / 2f;
 
 
-            highTemperatureLabelY  =  cardCenterRelativeY     +  (highTemperatureLabelHeight / 2f);
-            highTemperatureLabelX  =  verticalLeftGuideLine   -  highTemperatureLabelPaint.measureText(sHighFormatted) / 2f;
+            if(mAmbient && (mBurnInProtection || mLowBitAmbient) || sCityName.isEmpty()) {
+                highTemperatureLabelY = cardCenterRelativeY;
+                lowTemperatureLabelY = horizontalCardGuideline3;
 
-            lowTemperatureLabelY   =  (highTemperatureLabelY  +  highTemperatureLabelHeight + cardY2) / 2f - (lowTemperatureLableHeight / 2f) ;
-            lowTemperatureLabelX   =  highTemperatureLabelX;// highTemperatureLabelX   +  sHighFormattedWidth - sLowFormattedWidth - k ;
+            }else {
+                highTemperatureLabelY = horizontalCardGuideline2 + (highTemperatureLabelHeight / 2f);
+                lowTemperatureLabelY =  horizontalCardGuideline3 + (lowTemperatureLableHeight);
+            }
+
+            highTemperatureLabelX = verticalLeftGuideLine - highTemperatureLabelPaint.measureText(sHighFormatted) / 3f;
+            lowTemperatureLabelX = highTemperatureLabelX;
+
 
             cityTextY = ((highTemperatureLabelY + cardY) / 2f) - (cityLabelHeight * 0.5f);
-            cityTextX =  verticalLeftGuideLine - sHighFormattedWidth / 2f;
+            cityTextX = highTemperatureLabelX;
 
-            hourLabelY =  (mCenterY *  0.60f + hourLabelHeight) / 2f;
-            minLabelY  =   mCenterY *  0.85f / 2f + hourLabelHeight;
+            if(isRound) {
+                hourLabelY = cardY / 1.8f;
+                minLabelY = cardY / 1.15f;
+            }else{
+                hourLabelY = cardY / 1.8f;
+                minLabelY = hourLabelY;
+            }
         }
 
         @Override
@@ -239,10 +268,11 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             super.onCreate(holder);
 
             setWatchFaceStyle(new WatchFaceStyle.Builder(SunshineWatchFace.this)
-
                     .build());
 
             mCalendar = Calendar.getInstance();
+
+            isRound = getResources().getConfiguration().isScreenRound();
 
             initializeBackground();
             initializeWatchFace();
@@ -250,28 +280,30 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             updateWeatherData(getBaseContext());
 
 
-
             LocalBroadcastManager.getInstance(getBaseContext()).registerReceiver(mWeatherReceiver,
                     new IntentFilter("weather_changed"));
         }
 
 
-
         private void initializeBackground() {
-            mBackgroundPaint = new Paint();
-            mBackgroundPaint.setColor(Color.WHITE);
+            cardPaint = new Paint();
+            cardPaint.setColor(Color.WHITE);
 
-            mBackgroundPaintStroke = new Paint();
-            mBackgroundPaintStroke.setColor(Color.WHITE);
-            mBackgroundPaintStroke.setStrokeWidth(1);
-            mBackgroundPaintStroke.setAntiAlias(true);
-            mBackgroundPaintStroke.setStyle(Paint.Style.STROKE);
-            mBackgroundPaintStroke.setShadowLayer(SHADOW_RADIUS, 0, 0, Color.BLACK);
+            cardStrokePaint = new Paint();
+            cardStrokePaint.setColor(Color.WHITE);
+            cardStrokePaint.setStrokeWidth(1.2f);
+            cardStrokePaint.setAntiAlias(true);
+            cardStrokePaint.setStyle(Paint.Style.STROKE);
+            cardStrokePaint.setShadowLayer(SHADOW_RADIUS, 0, 0, Color.BLACK);
+
+            lowBitCardPaint = new Paint();
+            lowBitCardPaint.setColor(Color.parseColor("#212121"));
+
         }
 
         private void initializeWatchFace() {
             /* Set defaults for colors */
-            mPrimaryColor = getResources().getColor(R.color.primaryColor,getTheme());
+            mPrimaryColor = getResources().getColor(R.color.primaryColor, getTheme());
             mWatchHandColor = Color.GRAY;
             mWatchHandHighlightColor = mPrimaryColor;
             mWatchHandShadowColor = Color.BLACK;
@@ -311,10 +343,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
              ********************************/
 
 
-            sp12 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12f,getResources().getDisplayMetrics());
-            sp18 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,18f,getResources().getDisplayMetrics());
-            dp28 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,28f,getResources().getDisplayMetrics());
-            sp32 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,32f,getResources().getDisplayMetrics());
+            sp12 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, getResources().getDisplayMetrics());
+            sp18 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 18f, getResources().getDisplayMetrics());
+            dp28 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 28f, getResources().getDisplayMetrics());
+            sp32 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 32f, getResources().getDisplayMetrics());
 
 
 
@@ -343,17 +375,13 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
             mTemperatureHighAmbientPaint = new Paint();
             mTemperatureHighAmbientPaint.setColor(Color.WHITE);
-            mTemperatureHighAmbientPaint.setTextSize(sp18);
-            mTemperatureHighAmbientPaint.setStyle(Paint.Style.STROKE);
-            mTemperatureHighAmbientPaint.setStrokeWidth(0.4f);
-            mTemperatureHighAmbientPaint.setAntiAlias(true);
+            mTemperatureHighAmbientPaint.setTextSize(sp32);
+            mTemperatureHighAmbientPaint.setTypeface(typeface);
 
             mTemperatureLowAmbientPaint = new Paint();
             mTemperatureLowAmbientPaint.setColor(Color.WHITE);
             mTemperatureLowAmbientPaint.setTextSize(sp12);
-            mTemperatureLowAmbientPaint.setStyle(Paint.Style.STROKE);
-            mTemperatureLowAmbientPaint.setStrokeWidth(0.6f);
-            mTemperatureLowAmbientPaint.setAntiAlias(true);
+            mTemperatureLowAmbientPaint.setTypeface(typeface);
 
             highTemperatureLabelPaint = mTemperatureHighActivePaint;
             lowTemperatureLabelPaint = mTemperatureLowActivePaint;
@@ -378,7 +406,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mHourLabelPaint.setTypeface(typeface);
             mHourLabelPaint.setTextSize(sp32);
             mHourLabelPaint.setAntiAlias(true);
-
 
             mMinutePaint = new Paint();
             mMinutePaint.setColor(Color.WHITE);
@@ -412,24 +439,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mRightIndicatorStroke.setStrokeWidth(3f);
             mRightIndicatorStroke.setStyle(Paint.Style.STROKE);
             mRightIndicatorStroke.setAntiAlias(true);
-            mRightIndicatorStroke.setMaskFilter(new BlurMaskFilter(dp28 -7f, BlurMaskFilter.Blur.INNER));
-
-
-            /* *********************************************
-             ** Calculating font metrics for positioning  **
-             ***********************************************/
-
-            Paint.FontMetrics fm = mTemperatureHighAmbientPaint.getFontMetrics();
-            highTemperatureLabelHeight = fm.descent - fm.ascent;
-
-            fm = mHourLabelPaint.getFontMetrics();
-            hourLabelHeight = fm.descent - fm.ascent;
-
-            fm = mCityLabelPaint.getFontMetrics();
-            cityLabelHeight = fm.descent - fm.ascent;
-
-            fm = lowTemperatureLabelPaint.getFontMetrics();
-            lowTemperatureLableHeight = fm.descent - fm.ascent;
+            mRightIndicatorStroke.setMaskFilter(new BlurMaskFilter(dp28 - 7f, BlurMaskFilter.Blur.INNER));
         }
 
         @Override
@@ -466,10 +476,25 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         }
 
         private void updateWatchHandStyle() {
+            mHourLabelPaint.setAntiAlias(!mAmbient);
+            mMinutePaint.setAntiAlias(!mAmbient);
+
+            if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
+                ColorMatrix ma = new ColorMatrix();
+                ma.setSaturation(0);
+                mWeatherStatePaint = new Paint();
+                mWeatherStatePaint.setAntiAlias(false);
+                mWeatherStatePaint.setColorFilter(new ColorMatrixColorFilter(ma));
+
+                highTemperatureLabelPaint = mTemperatureHighActivePaint;
+                lowTemperatureLabelPaint = mTemperatureLowActivePaint;
+
+            }
             if (mAmbient) {
                 highTemperatureLabelPaint = mTemperatureHighAmbientPaint;
                 lowTemperatureLabelPaint = mTemperatureLowAmbientPaint;
             } else {
+                mWeatherStatePaint = new Paint();
                 highTemperatureLabelPaint = mTemperatureHighActivePaint;
                 lowTemperatureLabelPaint = mTemperatureLowActivePaint;
             }
@@ -501,9 +526,8 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mCenterY = height / 2f;
             sWidth = width;
             sHeight = height;
-            setValues(mCenterX,mCenterY);
+            setValues(mCenterX, mCenterY);
         }
-
 
         /**
          * Captures tap event (and tap type). The {@link WatchFaceService#TAP_TYPE_TAP} case can be
@@ -533,7 +557,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             long now = System.currentTimeMillis();
             mCalendar.setTimeInMillis(now);
 
-            setValues(mCenterX,mCenterY);
+            hour = mCalendar.get(Calendar.HOUR);
+            min = mCalendar.get(Calendar.MINUTE);
+
+            setValues(mCenterX, mCenterY);
             drawBackground(canvas);
             drawWatchFace(canvas);
         }
@@ -541,14 +568,14 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
         private void drawBackground(Canvas canvas) {
             if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
-                canvas.drawColor(Color.WHITE);
-              //  canvas.drawRect(0,0,bounds.width(), bounds.height()/2,mBackgroundPaint);
+                canvas.drawColor(Color.BLACK);
+                canvas.drawRect(0, cardY, sWidth, cardY2, lowBitCardPaint);
             } else if (mAmbient) {
                 canvas.drawColor(Color.BLACK);
             } else {
                 canvas.drawColor(mPrimaryColor);
-                canvas.drawRect(0, cardY, sWidth, cardY2, mBackgroundPaintStroke);
-                canvas.drawRect(0, cardY, sWidth, cardY2, mBackgroundPaint);
+                canvas.drawRect(0, cardY, sWidth, cardY2, cardStrokePaint);
+                canvas.drawRect(0, cardY, sWidth, cardY2, cardPaint);
             }
         }
 
@@ -562,28 +589,30 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
              */
 
 
-            float innerTickRadius = mCenterX - 10;
-            float outerTickRadius = mCenterX;
-            for (int tickIndex = 0; tickIndex < 12; tickIndex++) {
-                float tickRot = (float) (tickIndex * Math.PI * 2 / 12);
-                float innerX = (float) Math.sin(tickRot) * innerTickRadius;
-                float innerY = (float) -Math.cos(tickRot) * innerTickRadius;
+            mLowBitAmbient = true;//TODO REMOVE TEST ONLY
 
-                float outerX = (float) Math.sin(tickRot) * outerTickRadius;
-                float outerY = (float) -Math.cos(tickRot) * outerTickRadius;
+            if (!mAmbient && isRound) {
+                float innerTickRadius = mCenterX - 10;
+                float outerTickRadius = mCenterX;
+                for (int tickIndex = 0; tickIndex < 12; tickIndex++) {
+                    float tickRot = (float) (tickIndex * Math.PI * 2 / 12);
+                    float innerX = (float) Math.sin(tickRot) * innerTickRadius;
+                    float innerY = (float) -Math.cos(tickRot) * innerTickRadius;
 
-                canvas.drawLine(mCenterX + innerX, mCenterY + innerY,
-                        mCenterX + outerX, mCenterY + outerY,
-                        (tickIndex == 3 || tickIndex == 4 || tickIndex == 8 || tickIndex == 9) ? mTickSecondaryPaint : mTickPrimaryPaint
-                );
-            }
+                    float outerX = (float) Math.sin(tickRot) * outerTickRadius;
+                    float outerY = (float) -Math.cos(tickRot) * outerTickRadius;
+
+                    canvas.drawLine(mCenterX + innerX, mCenterY + innerY,
+                            mCenterX + outerX, mCenterY + outerY,
+                            (tickIndex == 3 || tickIndex == 4 || tickIndex == 8 || tickIndex == 9) ? mTickSecondaryPaint : mTickPrimaryPaint
+                    );
+                }
 
 
-            final float seconds =
-                    (mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / 1000f);
+                final float seconds =
+                        (mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / 1000f);
 
 
-            if (!mAmbient) {
                 float tickRot = (float) (seconds * Math.PI * 2 / 60);
                 float innerX = (float) Math.sin(tickRot) * innerTickRadius;
                 float innerY = (float) -Math.cos(tickRot) * innerTickRadius;
@@ -594,17 +623,16 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                 canvas.drawLine(mCenterX + innerX, mCenterY + innerY,
                         mCenterX + outerX, mCenterY + outerY,
                         seconds >= 0 && seconds < 1 ? mTickThirdSecondaryPaint :
-                        (seconds >= 38 && seconds <= 46 || seconds >= 14 && seconds <= 23 ) ? mTickSecondaryPaint : mTickPrimaryPaint
+                                (seconds >= 38 && seconds <= 46 || seconds >= 14 && seconds <= 23) ? mTickSecondaryPaint : mTickPrimaryPaint
                 );
             }
 
-
-
-            if (!mAmbient) {
+            if(!mAmbient){
                 canvas.drawCircle(rightIndicatorCX, rightIndicatorCY, rightIndicatorRadius, mRightIndicator);
-                canvas.drawCircle(rightIndicatorCX, rightIndicatorCY,rightIndicatorInnerShadowRadius, mRightIndicatorStroke);
+                canvas.drawCircle(rightIndicatorCX, rightIndicatorCY, rightIndicatorInnerShadowRadius, mRightIndicatorStroke);
+            }
 
-
+            if (!mAmbient || mAmbient && (mLowBitAmbient || mBurnInProtection)) {
                 canvas.drawBitmap(
                         mWeatherBitmap,
                         rightIndicatorCX - mWeatherIconX,
@@ -612,13 +640,12 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                         mWeatherStatePaint);
             }
 
-
-
-            canvas.drawText("Los Angeles",
-                    cityTextX,
-                    cityTextY,
-                    mCityLabelPaint);
-
+            if(!mAmbient && !sCityName.isEmpty())
+                canvas.drawText(
+                        sCityName,
+                        cityTextX,
+                        cityTextY,
+                        mCityLabelPaint);
 
             canvas.drawText(
                     sHighFormatted,
@@ -628,21 +655,52 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             );
 
 
-            canvas.drawText(sLowFormatted,
+            canvas.drawText(
+                    sLowFormatted,
                     lowTemperatureLabelX,
                     lowTemperatureLabelY,
                     lowTemperatureLabelPaint
             );
 
 
+            String sHour;
+            String sMin = String.format(Locale.getDefault(),"%02d",min);
 
-            String min = String.valueOf(mCalendar.get(Calendar.MINUTE));
-            String hour = String.valueOf(mCalendar.get(Calendar.HOUR));
 
-            canvas.drawText(hour, mCenterX - (mHourLabelPaint.measureText(hour) / 2f),  hourLabelY , mHourLabelPaint);
-            canvas.drawText(min,  mCenterX - (mMinutePaint.measureText(hour) / 2f), minLabelY, mMinutePaint);
+            if(isRound){
+                sHour = String.valueOf(hour);
+            }else{
+                sHour = String.format(Locale.getDefault(),"%02d",hour);
+            }
+
+
+
+            if(isRound) {
+                canvas.drawText(sHour, mCenterX - mHourLabelPaint.measureText(sHour) / 2f, hourLabelY, mHourLabelPaint);
+                canvas.drawText(sMin, mCenterX - mMinutePaint.measureText(sMin) / 2f, minLabelY, mMinutePaint);
+            }else{
+                canvas.drawText(sHour, mCenterX - mHourLabelPaint.measureText(sHour), hourLabelY, mHourLabelPaint);
+                canvas.drawText(":",mCenterX,hourLabelY,mHourLabelPaint);
+                canvas.drawText(sMin, mCenterX + mHourLabelPaint.measureText(":"), minLabelY, mMinutePaint);
+            }
 
         }
+
+
+        /*
+        private void showGuideLines(Canvas canvas){
+            Paint p = new Paint();
+            p.setStrokeWidth(1f);
+            p.setColor(Color.RED);
+
+            canvas.drawLine(0, horizontalCardGuideline1,sWidth, horizontalCardGuideline1,p);
+            canvas.drawLine(0, horizontalCardGuideline2,sWidth, horizontalCardGuideline2,p);
+            canvas.drawLine(0, horizontalCardGuideline3,sWidth, horizontalCardGuideline3,p);
+
+            canvas.drawLine(verticalLeftGuideLine,0,verticalLeftGuideLine,sHeight,p);
+            canvas.drawLine(verticalRightGuideLine,0,verticalRightGuideLine,sHeight,p);
+            canvas.drawLine(mCenterX,0,mCenterX,sHeight,p);
+        }*/
 
         @Override
         public void onVisibilityChanged(boolean visible) {
@@ -717,25 +775,40 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             }
         };
 
-        private void updateWeatherData(Context context){
+        private void updateWeatherData(Context context) {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            tempHigh = preferences.getInt("high",-0);
-            tempLow = preferences.getInt("low",-0);
-            icon = preferences.getString("icon","storm");
-            mWeatherBitmap = BitmapFactory.decodeResource(getResources(),getSmallArtResourceIdForWeatherCondition(icon));
-            sHighFormatted = SunshineWearUtils.formatTemperature(getBaseContext(),tempHigh);
-            sLowFormatted = SunshineWearUtils.formatTemperature(getBaseContext(),tempLow);
+            tempHigh = preferences.getInt("high", -0);
+            tempLow = preferences.getInt("low", -0);
+            icon = preferences.getString("icon", "storm");
+            mWeatherBitmap = BitmapFactory.decodeResource(getResources(), getSmallArtResourceIdForWeatherCondition(icon));
+            sHighFormatted = SunshineWearUtils.formatTemperature(getBaseContext(), tempHigh);
+            sLowFormatted = SunshineWearUtils.formatTemperature(getBaseContext(), tempLow);
 
             mWeatherBitmapHeight = mWeatherBitmap.getHeight();
             mWeatherBitmapWidth = mWeatherBitmap.getWidth();
+
+            sCityName = preferences.getString("cityName", "");
+
+
+            Rect bounds = new Rect();
+            highTemperatureLabelPaint.getTextBounds(sHighFormatted, 0, 1, bounds);
+            highTemperatureLabelHeight = bounds.height();
+
+            lowTemperatureLabelPaint.getTextBounds(sLowFormatted,0,1,bounds);
+            lowTemperatureLableHeight = bounds.height();
+
+            if(!sCityName.isEmpty()){
+                mCityLabelPaint.getTextBounds(sCityName,0,1,bounds);
+                cityLabelHeight = bounds.height();
+            }
         }
 
 
         int getSmallArtResourceIdForWeatherCondition(String weatherIcon) {
 
-        /*
-         * Based on weather code data for Open Weather Map.
-         */
+            /*
+             * Based on weather code data for Open Weather Map.
+             */
             if (weatherIcon.equals("thunderstorm")) {
                 return R.drawable.ic_storm;
                 //} else if (weatherIcon >= 300 && weatherIcon <= 321) {
@@ -754,7 +827,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                 return R.drawable.ic_cloudy;
             }
 
-            return R.drawable.ic_storm;
+            return R.drawable.ic_fog;
         }
 
 

@@ -27,6 +27,7 @@ import com.example.android.sunshine.models.ForecastResult;
 import com.example.android.sunshine.utilities.NotificationUtils;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
@@ -116,10 +117,12 @@ public class SunshineSyncTask {
         ForecastResult.Daily daily = forecastResult.getDaily();
         ForecastResult.Datum_ datum = daily.getData().get(0);
 
+        DataMap data = dataMap.getDataMap();
 
-        dataMap.getDataMap().putDouble("high", datum.getTemperatureHigh());
-        dataMap.getDataMap().putDouble("low", datum.getTemperatureLow());
-        dataMap.getDataMap().putString("icon", datum.getIcon());
+        data.putDouble("high", datum.getTemperatureHigh());
+        data.putDouble("low", datum.getTemperatureLow());
+        data.putString("icon", datum.getIcon());
+        data.putString("cityName",SunshinePreferences.getPreferredWeatherLocation(context));
 
 
         PutDataRequest request = dataMap.asPutDataRequest();

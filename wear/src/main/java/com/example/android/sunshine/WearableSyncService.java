@@ -2,6 +2,7 @@ package com.example.android.sunshine;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -41,26 +42,34 @@ public class WearableSyncService extends WearableListenerService {
             Uri uri = event.getDataItem().getUri();
             if(uri.getPath().equals("/weather")) {
 
+                SharedPreferences sharedPreferences =  PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                SharedPreferences.Editor editor = sharedPreferences.edit();
 
                 DataMap dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                 if (dataMap.containsKey("high")) {
-                    PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().putInt("high", (int) dataMap.getDouble("high")).apply();
+                    editor.putInt("high", (int) dataMap.getDouble("high")).apply();
                     Log.d(TAG, "DATA: " + dataMap.getDouble("high"));
                 }
                 if (dataMap.containsKey("low")) {
-                    PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().putInt("low", (int) dataMap.getDouble("low")).apply();
+                    editor.putInt("low", (int) dataMap.getDouble("low")).apply();
                     Log.d(TAG, "DATA: " + dataMap.getDouble("low"));
                 }
 
                 if (dataMap.containsKey("icon")) {
-                    PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().putString("icon", dataMap.getString("icon")).apply();
+                    editor.putString("icon", dataMap.getString("icon")).apply();
                     Log.d(TAG, "DATA: " + dataMap.getString("icon"));
                 }
 
                 if(dataMap.containsKey("units")){
-                    PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().putBoolean("units", dataMap.getBoolean("units")).apply();
+                    editor.putBoolean("units", dataMap.getBoolean("units"));
                     Log.d(TAG, "DATA: " + dataMap.getString("units"));
                 }
+
+                if(dataMap.containsKey("cityName")){
+                    editor.putString("cityName",dataMap.getString("cityName"));
+                }
+
+                editor.apply();
             }
 
             Intent intent = new Intent("weather_changed");

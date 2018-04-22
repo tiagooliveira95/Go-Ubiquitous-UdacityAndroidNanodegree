@@ -26,7 +26,7 @@ public class GeoRequest {
     }
 
     public GeoRequest(Context context, double lat, double lng){
-        KEY = context.getString(R.string.KEY);
+        KEY = context.getString(R.string.GEOKEY);
         this.lat = lat;
         this.lng = lng;
     }
