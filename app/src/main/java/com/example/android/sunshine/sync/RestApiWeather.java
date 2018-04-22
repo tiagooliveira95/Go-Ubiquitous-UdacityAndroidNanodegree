@@ -1,7 +1,5 @@
 package com.example.android.sunshine.sync;
 
-import android.content.Context;
-
 import com.example.android.sunshine.BuildConfig;
 import com.example.android.sunshine.models.ForecastResult;
 import com.example.android.sunshine.models.ForecastRequest;
@@ -80,8 +78,12 @@ public class RestApiWeather {
         );
     }
 
-    Call<GeoResult> getGeoData(GeoRequest geoRequest){
-        return geoService.geoData(geoRequest.getFormat(),geoRequest.getAddress(),geoRequest.getKEY());
+    Call<GeoResult> getLatLngFromAddress(GeoRequest geoRequest){
+        return geoService.getLatLngFromAddress(geoRequest.getFormat(),geoRequest.getAddress(),geoRequest.getKEY());
+    }
+
+    Call<GeoResult> getAddressFromLatLng(GeoRequest geoRequest){
+        return geoService.getAddressFromLatLng(geoRequest.getFormat(),geoRequest.getLatLng(),geoRequest.getKEY());
     }
 
     interface WeatherService {
@@ -91,6 +93,9 @@ public class RestApiWeather {
 
     interface GeoService {
         @GET("{format}")
-        Call<GeoResult> geoData(@Path("format") String format, @Query("address") String address, @Query("key") String key);
+        Call<GeoResult> getLatLngFromAddress(@Path("format") String format, @Query("address") String address, @Query("key") String key);
+
+        @GET("{format}")
+        Call<GeoResult> getAddressFromLatLng(@Path("format") String format, @Query("latlng") String address, @Query("key") String key);
     }
 }

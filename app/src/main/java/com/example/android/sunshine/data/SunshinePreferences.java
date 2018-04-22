@@ -53,6 +53,7 @@ public final class SunshinePreferences {
         editor.apply();
     }
 
+
     /**
      * Resets the location coordinates stores in SharedPreferences.
      *
@@ -248,5 +249,12 @@ public final class SunshinePreferences {
 
     public static String getUnits(Context context) {
         return isMetric(context) ? ForecastRequest.UNITS_SI : ForecastRequest.UNITS_US;
+    }
+
+    public static void setLocationAddress(Context context, String locationAddress) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putString(context.getString(R.string.pref_location_key),locationAddress)
+                .apply();
     }
 }

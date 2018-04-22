@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -38,6 +39,7 @@ import android.widget.Toast;
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.sync.SunshineSyncUtils;
+import com.example.android.sunshine.utilities.SunshineLocationUtils;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.wearable.DataClient;
@@ -112,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements
         getSupportActionBar().setElevation(0f);
         ButterKnife.bind(this);
 
+        boolean isEnabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_location_auto),false);
+        SunshineLocationUtils.autoLocationService(this,isEnabled);
 
         SunshineSyncUtils.startImmediateSync(this);
         /*

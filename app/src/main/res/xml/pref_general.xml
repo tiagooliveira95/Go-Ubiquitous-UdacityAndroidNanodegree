@@ -18,6 +18,13 @@
                   android:layout_width="match_parent"
                   android:layout_height="match_parent">
 
+    <CheckBoxPreference
+        android:defaultValue="@bool/auto_location_enabled"
+        android:summaryOff="@string/pref_enable_notifications_false"
+        android:summaryOn="@string/pref_enable_notifications_true"
+        android:title="@string/pref_location_auto_label"
+        android:key="@string/pref_location_auto" />
+
     <EditTextPreference
         android:defaultValue="@string/pref_location_default"
         android:inputType="text"

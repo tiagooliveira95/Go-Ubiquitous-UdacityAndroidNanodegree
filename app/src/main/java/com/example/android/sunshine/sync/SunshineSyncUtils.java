@@ -193,8 +193,18 @@ public class SunshineSyncUtils {
      * @param context The Context used to start the IntentService for the sync.
      */
     public static void startImmediateSync(@NonNull final Context context) {
+
+        double[] latlng = SunshinePreferences.getLocationCoordinates(context);
+        double lat  = latlng[0];
+        double lng = latlng[1];
+
+        if(lat != 0.0 && lng != 0.0){
+            syncForecast(context);
+            return;
+        }
+
         GeoRequest geoRequest = new GeoRequest(context, SunshinePreferences.getPreferredWeatherLocation(context));
-        RestApiWeather.getInstance().getGeoData(geoRequest)
+        RestApiWeather.getInstance().getLatLngFromAddress(geoRequest)
                 .enqueue(new Callback<GeoResult>() {
             @Override
             public void onResponse(Call<GeoResult> call, Response<GeoResult> response) {
@@ -204,21 +214,7 @@ public class SunshineSyncUtils {
                         geoResult.getResults().get(0).getGeometry().getLocation().getLat(),
                         geoResult.getResults().get(0).getGeometry().getLocation().getLng()
                 );
-
-                RestApiWeather.getInstance().getForecast(new ForecastRequest(context))
-                        .enqueue(new Callback<ForecastResult>() {
-                            @Override
-                            public void onResponse(Call<ForecastResult> call, Response<ForecastResult> response) {
-                                Intent intentToSyncImmediately = new Intent(context, SunshineSyncIntentService.class);
-                                intentToSyncImmediately.putExtra(SunshineSyncIntentService.ARG_FORECAST, response.body());
-                                context.startService(intentToSyncImmediately);
-                            }
-
-                            @Override
-                            public void onFailure(Call<ForecastResult> call, Throwable t) {
-                                Log.d("FAIL", "Failure: " + t.getMessage());
-                            }
-                        });
+                syncForecast(context);
             }
             @Override
             public void onFailure(Call<GeoResult> call, Throwable t) {}
@@ -226,5 +222,22 @@ public class SunshineSyncUtils {
 
 
 
+    }
+
+    private static void syncForecast(Context context){
+        RestApiWeather.getInstance().getForecast(new ForecastRequest(context))
+                .enqueue(new Callback<ForecastResult>() {
+                    @Override
+                    public void onResponse(Call<ForecastResult> call, Response<ForecastResult> response) {
+                        Intent intentToSyncImmediately = new Intent(context, SunshineSyncIntentService.class);
+                        intentToSyncImmediately.putExtra(SunshineSyncIntentService.ARG_FORECAST, response.body());
+                        context.startService(intentToSyncImmediately);
+                    }
+
+                    @Override
+                    public void onFailure(Call<ForecastResult> call, Throwable t) {
+                        Log.d("FAIL", "Failure: " + t.getMessage());
+                    }
+                });
     }
 }

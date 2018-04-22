@@ -15,18 +15,28 @@
  */
 package com.example.android.sunshine;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.PreferenceScreen;
 
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
+import com.example.android.sunshine.sync.LocationService;
 import com.example.android.sunshine.sync.SunshineSyncUtils;
+import com.example.android.sunshine.utilities.SunshineLocationUtils;
 import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 
 /**
@@ -89,6 +99,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         // register the preference change listener
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
+
+    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        boolean isEnabled = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_location_auto),false);
+        getPreferenceScreen().findPreference(getString(R.string.pref_location_key)).setEnabled(!isEnabled);
     }
 
     @Override
@@ -104,6 +123,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             // units have changed. update lists of weather entries accordingly
             SunshineWeatherUtils.notifyWearUnitsChanged(activity);
             activity.getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
+        } else if(key.endsWith(getString(R.string.pref_location_auto))){
+
+            boolean isEnabled = sharedPreferences.getBoolean(getString(R.string.pref_location_auto),false);
+            getPreferenceScreen().findPreference(getString(R.string.pref_location_key)).setEnabled(!isEnabled);
+
+            if(isEnabled){
+                askForPermission(activity,sharedPreferences);
+            }else{
+                SunshineLocationUtils.autoLocationService(activity,false);
+            }
+
+
         }
         Preference preference = findPreference(key);
         if (null != preference) {
@@ -112,4 +143,31 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             }
         }
     }
+
+
+    private void askForPermission(Activity activity, SharedPreferences sharedPreferences) {
+        String permission = Manifest.permission.ACCESS_FINE_LOCATION;
+
+        if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+
+            getPreferenceScreen().findPreference(getString(R.string.pref_location_key)).setEnabled(true);
+            sharedPreferences.edit().putBoolean(getString(R.string.pref_location_auto),false).apply();
+
+            ((CheckBoxPreference)getPreferenceScreen().findPreference(getString(R.string.pref_location_auto))).setChecked(false);
+
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+                ActivityCompat.requestPermissions(activity, new String[]{permission}, 9001);
+            } else {
+                ActivityCompat.requestPermissions(activity, new String[]{permission}, 9001);
+            }
+        }else{
+            SunshineLocationUtils.autoLocationService(activity,true);
+        }
+    }
+
+
+
+
+
 }

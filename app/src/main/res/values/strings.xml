@@ -69,6 +69,7 @@
 
     <!-- Label for the location preference -->
     <string name="pref_location_label">Location</string>
+    <string name="pref_location_auto_label">Auto Location</string>
 
 
     <!-- Key name for storing location in SharedPreferences -->
@@ -250,5 +251,6 @@
     <string name="weather_condition_clear">Clear Day</string>
     <string name="weather_condition_partly_cloudy">Partly Cloudy</string>
     <string name="weather_condition_cloudy">Cloudy</string>
+    <string name="pref_location_auto">location_auto</string>
 
 </resources>
