@@ -236,7 +236,7 @@ public class SunshineSyncUtils {
 
                     @Override
                     public void onFailure(Call<ForecastResult> call, Throwable t) {
-                        Log.d("FAIL", "Failure: " + t.getMessage());
+                        Log.e("FAIL", "Failure: " + t.getMessage());
                     }
                 });
     }

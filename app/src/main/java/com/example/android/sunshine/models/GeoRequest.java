@@ -11,17 +11,16 @@ import java.util.Locale;
  */
 
 public class GeoRequest {
-    public static final String FORMAT_JSON = "json";
+    private static final String FORMAT_JSON = "json";
 
     private double lat,lng;
 
     private final String KEY;
-    private String format = FORMAT_JSON;
 
     private String address;
 
     public GeoRequest(Context context, String address){
-        KEY = context.getString(R.string.KEY);
+        KEY = context.getString(R.string.GEOKEY);
         this.address = address;
     }
 
@@ -35,12 +34,8 @@ public class GeoRequest {
         return KEY;
     }
 
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
     public String getFormat() {
-        return format;
+        return FORMAT_JSON;
     }
 
     public String getAddress() {

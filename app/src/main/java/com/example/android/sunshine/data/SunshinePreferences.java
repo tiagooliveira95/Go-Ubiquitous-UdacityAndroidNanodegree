@@ -21,8 +21,6 @@ import android.preference.PreferenceManager;
 
 import com.example.android.sunshine.R;
 import com.example.android.sunshine.models.ForecastRequest;
-import com.example.android.sunshine.models.ForecastResult;
-import com.example.android.sunshine.sync.RestApiWeather;
 
 public final class SunshinePreferences {
 

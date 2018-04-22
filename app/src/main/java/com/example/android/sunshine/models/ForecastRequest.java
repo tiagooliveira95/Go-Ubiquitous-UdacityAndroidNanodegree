@@ -13,11 +13,9 @@ public class ForecastRequest {
 
     private String APPID;
 
-    private int numDays = 14;
     public static final String UNITS_SI = "si";
     public static final String UNITS_US = "us";
     private String lat,lon;
-    private String units;
 
     /**
      * Load Defaults
@@ -27,7 +25,6 @@ public class ForecastRequest {
         double[] preferredCoordinates = SunshinePreferences.getLocationCoordinates(context);
         lat = String.valueOf(preferredCoordinates[0]);
         lon = String.valueOf(preferredCoordinates[1]);
-        units = SunshinePreferences.getUnits(context);
     }
 
 
@@ -37,7 +34,7 @@ public class ForecastRequest {
     }
 
     public String getUnits(){
-        return units;
+        return UNITS_SI;
     }
 
     public String getLat() {

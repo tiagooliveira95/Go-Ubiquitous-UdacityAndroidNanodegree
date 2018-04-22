@@ -1,7 +1,6 @@
 package com.example.android.sunshine.models;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -60,7 +59,7 @@ public class ForecastResult implements Parcelable {
 
     };
 
-    protected ForecastResult(Parcel in) {
+    private ForecastResult(Parcel in) {
         this.latitude = ((double) in.readValue((double.class.getClassLoader())));
         this.longitude = ((double) in.readValue((double.class.getClassLoader())));
         this.timezone = ((String) in.readValue((String.class.getClassLoader())));
